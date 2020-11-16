@@ -10,7 +10,7 @@ states = 40;
 pbl_data = pd.read_csv("uci-secom.csv",sep=',')
 X = pd.DataFrame()
 X_temp = pd.DataFrame()
-X = pbl_data[['4','490','Pass/Fail']]
+X = pbl_data[['0','14','Pass/Fail']]
 X = X.dropna(axis =0)
 X = X.reset_index()
 y = X['Pass/Fail']

@@ -23,13 +23,13 @@ for i in range(minlen,maxlen) :
     X = pd.DataFrame()
     X_Pass = pd.DataFrame()
     X_Fail = pd.DataFrame()
-    X_FULL = pd.DataFrame()
     X['Pass/Fail'] = pbl_data['Pass/Fail']
     for v in range(0,len(case)) :
       X[str(case[v])] = pbl_data[str(case[v])]
     X = X.dropna(axis =0)
     X = X.reset_index()
     for v in range(0,len(X.index)) :
+    	#print (X.iloc[[v]])
     	if X.iloc[[v]]['Pass/Fail'][v] == -1 :
     		X_Pass = X_Pass.append(X.iloc[[v]])
     	else :
@@ -40,17 +40,11 @@ for i in range(minlen,maxlen) :
     X_choice = pd.DataFrame()
     for v in random :
     	X_choice = X_choice.append(X_Pass.iloc[[v]])
-
-    X_FULL = X_FULL.append(X)
-    Y_FULL = X_FULL['Pass/Fail']
-    X_FULL = X_FULL.drop(['Pass/Fail','index'],axis=1)
-
     X = X_choice.append(X_Fail)
     y = X['Pass/Fail']
-    X =X.drop(['Pass/Fail','index','level_0'],axis=1)
-    print(case)
-    print("Total data : ",len(X_FULL.index),"\t Fail data : ",len(X_Fail.index),"\t Train data : ",len(X.index))
-    print("\n\n")
+    X =X.drop('Pass/Fail',axis=1)
+    print("Fail len : ",len(X.index),"\t Total len : ",len(X_Fail.index))
+    print (case)
     msg = str(i)
     msg += ' : [ '
     for v in range(0,len(case)-1) :
@@ -63,18 +57,18 @@ for i in range(minlen,maxlen) :
       if len(pd.value_counts(y_train.values, sort=False)) == 2  and len(pd.value_counts(y_test.values, sort=False)) == 2 and pd.value_counts(y_test.values, sort=False)[1] > 10 : 
 	      log_reg = LogisticRegression(random_state=states,solver='liblinear',C=10.)
 	      log_reg.fit(X_train,y_train)
-	      pred = log_reg.predict(X_FULL)
-	      if accuracy_score(Y_FULL,pred) != 1 :
+	      pred = log_reg.predict(X_test)
+	      if accuracy_score(y_test,pred) != 1 :
 	        msg += " accuracy : "
-	        msg += str(accuracy_score(Y_FULL,pred))
+	        msg += str(accuracy_score(y_test,pred))
 	        msg += ", recall : "
-	        msg += str(recall_score(Y_FULL,pred,zero_division=1))
+	        msg += str(recall_score(y_test,pred, average="weighted",zero_division=1))
 	        msg += ", precision : "
-	        msg += str(precision_score(Y_FULL,pred,zero_division=1))
+	        msg += str(precision_score(y_test,pred, average="weighted",zero_division=1))
 	        msg += ", f1 : "
-	        msg += str(f1_score(Y_FULL,pred, zero_division=1))
+	        msg += str(f1_score(y_test,pred, average="weighted",zero_division=1))
 	        msg += ", roc_auc : "
-	        msg += str(roc_auc_score(Y_FULL,log_reg.predict_proba(X_FULL)[:,1]))
+	        msg += str(roc_auc_score(y_test,log_reg.predict_proba(X_test)[:,1], average='weighted'))
 	        msg += '\n'
 	        file.write(msg)
     end = 0;
